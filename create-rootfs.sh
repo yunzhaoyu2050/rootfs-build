@@ -52,6 +52,14 @@ elif [ "$RF_ARCH" == "arm64" ]; then
 fi
 sudo chmod +x $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
 
+# adb
+if [ "$RF_ARCH" == "armhf" ]; then
+    sudo cp -rf overlay-debug/usr/local/share/adb/adbd-32 $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
+elif [ "$RF_ARCH" == "arm64" ]; then
+    sudo cp -rf overlay-debug/usr/local/share/adb/adbd-64 $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
+fi
+sudo chmod +x $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
+
 # bt/wifi firmware
 if [ "$RF_ARCH" == "armhf" ]; then
     sudo cp overlay-firmware/usr/bin/brcm_patchram_plus1_32 $RF_SOURCE_ROOTFS_PATH/usr/bin/brcm_patchram_plus1
@@ -63,16 +71,8 @@ fi
 sudo chmod +x $RF_SOURCE_ROOTFS_PATH/usr/bin/rk_wifi_init
 
 sudo mkdir -p $RF_SOURCE_ROOTFS_PATH/system/lib/modules/
-sudo cp -f $RF_KERNEL_MODULE_PATH/modules/4.4.167/kernel/drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/bcmdhd.ko $RF_SOURCE_ROOTFS_PATH/system/lib/modules/
+#sudo cp -f $RF_KERNEL_MODULE_PATH/modules/4.4.167/kernel/drivers/net/wireless/rockchip_wlan/rkwifi/bcmdhd/bcmdhd.ko $RF_SOURCE_ROOTFS_PATH/system/lib/modules/
 sudo find $RF_WLAN_KERNEL_MODULE_PATH/* -name "*.ko" | xargs -n1 -i sudo cp {} $RF_SOURCE_ROOTFS_PATH/system/lib/modules/
-
-# adb
-if [ "$RF_ARCH" == "armhf" ]; then
-    sudo cp -rf overlay-debug/usr/local/share/adb/adbd-32 $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
-elif [ "$RF_ARCH" == "arm64" ]; then
-    sudo cp -rf overlay-debug/usr/local/share/adb/adbd-64 $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
-fi
-sudo chmod +x $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
 
 # kernel module
 if [ -d $TEMP_IMG_PATH ]; then
@@ -99,18 +99,36 @@ echo $RF_HOST > /etc/hostname
 echo "127.0.0.1 $RF_HOST" >> /etc/hosts
 echo "127.0.0.1 localhost.localdomain localhost" > /etc/hosts
 
-#echo "auto eth0" > /etc/network/interfaces.d/eth0
-#echo "iface eth0 inet dhcp" >> /etc/network/interfaces.d/eth0
-#echo "nameserver 8.8.8.8 " >> /etc/resolv.conf
+# ----------------------------------------network------------------------------------------------
+# config eth0
+echo "auto eth0" > /etc/network/interfaces.d/eth0
+echo "iface eth0 inet static" >> /etc/network/interfaces.d/eth0
+echo "address 169.254.24.12" >> /etc/network/interfaces.d/eth0
+echo "netmask 255.255.0.0" >> /etc/network/interfaces.d/eth0
+echo "gateway 169.254.24.1" >> /etc/network/interfaces.d/eth0
+# config wlan0
+echo "auto wlan0" > /etc/network/interfaces.d/wlan0
+echo "iface wlan0 inet static" >> /etc/network/interfaces.d/wlan0
+echo "address 192.168.31.9" >> /etc/network/interfaces.d/wlan0
+echo "netmask 255.255.255.0" >> /etc/network/interfaces.d/wlan0
+echo "gateway 192.168.31.1" >> /etc/network/interfaces.d/wlan0
+# ----------------------------------------network------------------------------------------------
+# ----------------------------------------udev---------------------------------------------------
+# delete udev files
+# 1.udev usb net mac
+mv /lib/udev/rules.d/73-usb-net-by-mac.rules /lib/udev/rules.d/73-usb-net-by-mac.rules.bk
+#rm -f 73-usb-net-by-mac.rules
+# ----------------------------------------udev---------------------------------------------------
 
 chmod o+x /usr/lib/dbus-1.0/dbus-daemon-launch-helper
 chmod +x /etc/rc.local
 
+# ----------------------------------------software install---------------------------------------
 # update software
 apt-get update
 
-apt-get install -y locales --no-install-recommends
-dpkg-reconfigure locales
+#apt-get install -y locales --no-install-recommends
+#dpkg-reconfigure locales
 
 apt-get install -y udev sudo ssh vim --no-install-recommends 
 
@@ -121,8 +139,9 @@ cp /etc/Powermanager/triggerhappy.service /lib/systemd/system/triggerhappy.servi
 apt-get install -y ifupdown net-tools network-manager ethtool --no-install-recommends 
 apt-get install -y rsyslog bash-completion htop --no-install-recommends --fix-missing
 
-# install wlan tools
+# wlan tools
 apt-get install -y wireless-tools wpasupplicant iputils-ping --no-install-recommends 
+# ----------------------------------------software install---------------------------------------
 
 systemctl enable rockchip.service
 #systemctl mask systemd-networkd-wait-online.service
@@ -132,6 +151,7 @@ systemctl enable rockchip.service
 sed -i 's/5min/5sec/g' /etc/systemd/system/network-online.target.wants/networking.service
 
 apt-get clean
+
 exit
 EOF
 #-------------------------------user define------------------------------
