@@ -11,7 +11,6 @@ if [ $RF_SYSTEM_TYPE == "ubuntu" ]; then
     exit 1
 fi
 
-# 安装依赖软件
 sudo apt-get install qemu qemu-user-static binfmt-support debootstrap
 
 echo Download $RF_ARCH $RF_SYSTEM_VERSION rootfs
