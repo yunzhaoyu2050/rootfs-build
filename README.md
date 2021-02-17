@@ -10,11 +10,14 @@ rootfs-build for test , output debian image.
 
 3. __source board-config-info.shh__
 
-4. __sh ./download_rootfs.sh__
+4. __./download_rootfs.sh__
 
-5. __sh ./create-rootfs.sh__
+5. __./create-rootfs.sh__
 	eg. config "user define" part
 
-6. __sh ./create-image.sh__
+6. __./create-image.sh__
+
+7. __./build.sh__
+	eg. or to run example
 
 ###### For the world i love
