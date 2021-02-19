@@ -21,13 +21,13 @@ else
 fi
 
 sudo mount --bind /dev $RF_SOURCE_ROOTFS_PATH/dev/
-sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
+#sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
 sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
 sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
 
 echo -e "\033[34m Debootstrap rootfs...\033[0m"
 # config debian
-sudo LANGUAGE="en_US" LC_ALL=(unset) LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
+sudo LANGUAGE="en_US" LC_ALL=C LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
     LC_MEASUREMENT="zh_CN.UTF-8" LC_NAME="zh_CN.UTF-8" LC_TELEPHONE="zh_CN.UTF-8" LC_ADDRESS="zh_CN.UTF-8" \
     LC_MONETARY="zh_CN.UTF-8" LC_TIME="zh_CN.UTF-8" LANG="en_US.UTF-8" chroot $RF_SOURCE_ROOTFS_PATH /debootstrap/debootstrap --second-stage --verbose
 
@@ -92,7 +92,7 @@ RF_USER_PASSWD=admin
 RF_ROOT_PASSWD=admin
 
 # config rootfs
-sudo LANGUAGE="en_US" LC_ALL=(unset) LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
+sudo LANGUAGE="en_US" LC_ALL=C LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
     LC_MEASUREMENT="zh_CN.UTF-8" LC_NAME="zh_CN.UTF-8" LC_TELEPHONE="zh_CN.UTF-8" LC_ADDRESS="zh_CN.UTF-8" \
     LC_MONETARY="zh_CN.UTF-8" LC_TIME="zh_CN.UTF-8" LANG="en_US.UTF-8" chroot $RF_SOURCE_ROOTFS_PATH <<EOF
 # ----------------------------------------user---------------------------------------------------
@@ -136,11 +136,15 @@ chmod +x /etc/rc.local
 # update software
 apt-get update
 
+apt-get install -y
+
+apt --fix-broken install
+
 #apt-get install -y locales --no-install-recommends
 #dpkg-reconfigure locales
 apt-get install -y udev sudo ssh vim --no-install-recommends
 
-# config power management
+# power management
 apt-get install -y busybox pm-utils triggerhappy
 cp /etc/Powermanager/triggerhappy.service /lib/systemd/system/triggerhappy.service
 
@@ -149,6 +153,9 @@ apt-get install -y rsyslog bash-completion htop --no-install-recommends --fix-mi
 
 # wlan tools
 apt-get install -y wireless-tools wpasupplicant iputils-ping --no-install-recommends
+
+# x-window-system-core 
+#apt-get install x-window-system-core 
 # ----------------------------------------software_install---------------------------------------
 
 systemctl enable rockchip.service
@@ -166,7 +173,7 @@ exit
 EOF
 #-------------------------------user define------------------------------
 
-sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
+#sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
 sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
 sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
 sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
