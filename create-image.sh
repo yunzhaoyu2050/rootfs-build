@@ -14,6 +14,18 @@ fi
 TEMP_IMG_PATH=./image-cache/
 IMG_NAME=${RF_SYSTEM_TYPE}-${RF_SYSTEM_VERSION}-rootfs.img
 
+function err_exit() {
+    sudo umount $TEMP_IMG_PATH/
+    exit 1
+}
+trap err_exit ERR
+
+function err_exit() {
+    sudo umount $TEMP_IMG_PATH/
+    exit 1
+}
+trap err_exit INT
+
 echo -e "\033[32m Creat $RF_SYSTEM_TYPE $RF_SYSTEM_VERSION rootfs...\033[0m"
 
 if [ -d $TEMP_IMG_PATH ]; then

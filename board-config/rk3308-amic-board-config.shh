@@ -1,7 +1,6 @@
-# board-config-info.shh
 #!/bin/bash
 
-CUR_PATH=`pwd`
+CUR_PATH=$(pwd)
 
 #
 # for user dev board define - rk3308-amic-borad
@@ -19,11 +18,11 @@ export RF_ARCH=arm64
 export RF_KERNEL_MODULE_PATH=../mdk3308/oem_mdk/lib/
 # RF_WLAN_KERNEL_MODULE_PATH: /xxx/xx/x
 export RF_WLAN_KERNEL_MODULE_PATH=../kernel/drivers/net/wireless/rockchip_wlan
-# rootfs user name 
+# rootfs user name
 export RF_USER=admin
-# rootfs user passwd 
+# rootfs user passwd
 export RF_USER_PASSWD=admin
-# rootfs root passwd 
+# rootfs root passwd
 export RF_ROOT_PASSWD=admin
-# rootfs host name 
+# rootfs host name
 export RF_HOST=server
