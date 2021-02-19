@@ -22,12 +22,14 @@ fi
 
 sudo mount --bind /dev $RF_SOURCE_ROOTFS_PATH/dev/
 #sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
-#sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
-#sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
+sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
+sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
 
 echo -e "\033[34m Debootstrap rootfs...\033[0m"
 # config debian
-sudo LC_ALL=C LANGUAGE=C LANG=C chroot $RF_SOURCE_ROOTFS_PATH /debootstrap/debootstrap --second-stage --verbose
+sudo LANGUAGE="en_US" LC_ALL=C LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
+    LC_MEASUREMENT="zh_CN.UTF-8" LC_NAME="zh_CN.UTF-8" LC_TELEPHONE="zh_CN.UTF-8" LC_ADDRESS="zh_CN.UTF-8" \
+    LC_MONETARY="zh_CN.UTF-8" LC_TIME="zh_CN.UTF-8" LANG="en_US.UTF-8" chroot $RF_SOURCE_ROOTFS_PATH /debootstrap/debootstrap --second-stage --verbose
 
 #-------------------------------user define-------------------------------
 echo -e "\033[34m Copy user files...\033[0m"
@@ -86,13 +88,17 @@ fi
 echo -e "\033[34m Chroot rootfs and config software...\033[0m"
 RF_USER=admin
 RF_HOST=server
+RF_USER_PASSWD=admin
+RF_ROOT_PASSWD=admin
 
 # config rootfs
-sudo LC_ALL=C LANGUAGE=C LANG=C chroot $RF_SOURCE_ROOTFS_PATH <<EOF
+sudo LANGUAGE="en_US" LC_ALL=C LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
+    LC_MEASUREMENT="zh_CN.UTF-8" LC_NAME="zh_CN.UTF-8" LC_TELEPHONE="zh_CN.UTF-8" LC_ADDRESS="zh_CN.UTF-8" \
+    LC_MONETARY="zh_CN.UTF-8" LC_TIME="zh_CN.UTF-8" LANG="en_US.UTF-8" chroot $RF_SOURCE_ROOTFS_PATH <<EOF
 # ----------------------------------------user---------------------------------------------------
 # add new user and passwd
-sh /etc/app/cr_user_ps.sh $RF_USER admin # user , pass
-sh /etc/app/cr_user_ps.sh root admin # user , pass
+sh /etc/app/cr_user_ps.sh $RF_USER $RF_USER_PASSWD # user , pass
+sh /etc/app/cr_user_ps.sh root $RF_ROOT_PASSWD # user , pass
 # ----------------------------------------user---------------------------------------------------
 
 # ----------------------------------------host---------------------------------------------------
@@ -106,9 +112,10 @@ echo "127.0.0.1 localhost.localdomain localhost" >> /etc/hosts
 # config eth0
 echo "auto eth0" > /etc/network/interfaces.d/eth0
 echo "iface eth0 inet static" >> /etc/network/interfaces.d/eth0
-echo "address 169.254.24.12" >> /etc/network/interfaces.d/eth0
-echo "netmask 255.255.0.0" >> /etc/network/interfaces.d/eth0
-echo "gateway 169.254.24.1" >> /etc/network/interfaces.d/eth0
+echo "address 192.168.1.22" >> /etc/network/interfaces.d/eth0
+echo "netmask 255.255.255.0" >> /etc/network/interfaces.d/eth0
+echo "gateway 192.168.1.1" >> /etc/network/interfaces.d/eth0
+
 # config wlan0
 echo "auto wlan0" > /etc/network/interfaces.d/wlan0
 echo "iface wlan0 inet dhcp" >> /etc/network/interfaces.d/wlan0
@@ -129,11 +136,15 @@ chmod +x /etc/rc.local
 # update software
 apt-get update
 
+apt-get install -y
+
+apt --fix-broken install
+
 #apt-get install -y locales --no-install-recommends
 #dpkg-reconfigure locales
 apt-get install -y udev sudo ssh vim --no-install-recommends
 
-# config power management
+# power management
 apt-get install -y busybox pm-utils triggerhappy
 cp /etc/Powermanager/triggerhappy.service /lib/systemd/system/triggerhappy.service
 
@@ -142,6 +153,9 @@ apt-get install -y rsyslog bash-completion htop --no-install-recommends --fix-mi
 
 # wlan tools
 apt-get install -y wireless-tools wpasupplicant iputils-ping --no-install-recommends
+
+# x-window-system-core 
+#apt-get install x-window-system-core 
 # ----------------------------------------software_install---------------------------------------
 
 systemctl enable rockchip.service
@@ -160,8 +174,8 @@ EOF
 #-------------------------------user define------------------------------
 
 #sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
-#sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
-#sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
+sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
+sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
 sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
 
 echo -e "\033[34m Create rootfs end.\033[0m"
