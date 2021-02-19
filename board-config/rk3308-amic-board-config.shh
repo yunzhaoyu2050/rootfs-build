@@ -3,6 +3,10 @@
 
 CUR_PATH=`pwd`
 
+#
+# for user dev board define - rk3308-amic-borad
+#
+
 # RF_SYSTEM_TYPE: debian , ubuntu
 export RF_SYSTEM_TYPE=debian
 # RF_SYSTEM_VERSION: stretch debian9 , buster debian10
@@ -12,6 +16,14 @@ export RF_SOURCE_ROOTFS_PATH="debian_buster_rootfs"
 # RF_ARCH: arm64 , armhf
 export RF_ARCH=arm64
 # RF_KERNEL_MODULE_PATH: /xxx/xx/x
-export RF_KERNEL_MODULE_PATH=/mcuzone/work/mdk3308/oem_mdk/lib/
+export RF_KERNEL_MODULE_PATH=../mdk3308/oem_mdk/lib/
 # RF_WLAN_KERNEL_MODULE_PATH: /xxx/xx/x
 export RF_WLAN_KERNEL_MODULE_PATH=../kernel/drivers/net/wireless/rockchip_wlan
+# rootfs user name 
+export RF_USER=admin
+# rootfs user passwd 
+export RF_USER_PASSWD=admin
+# rootfs root passwd 
+export RF_ROOT_PASSWD=admin
+# rootfs host name 
+export RF_HOST=server

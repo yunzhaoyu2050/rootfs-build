@@ -1,4 +1,3 @@
-# create-image.sh
 #!/bin/bash -e
 
 # need board-config-info.shh :

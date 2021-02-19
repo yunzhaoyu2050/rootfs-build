@@ -1,4 +1,3 @@
-# create-rootfs.sh
 #!/bin/bash -e
 
 if [[ -z $RF_SYSTEM_TYPE || -z $RF_SYSTEM_VERSION || -z $RF_SOURCE_ROOTFS_PATH || -z $RF_ARCH ]]; then
@@ -20,16 +19,38 @@ else
     exit 1
 fi
 
-sudo mount --bind /dev $RF_SOURCE_ROOTFS_PATH/dev/
-#sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
-sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
-sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
+function mount_user_fs() {
+    sudo mount --bind /dev $RF_SOURCE_ROOTFS_PATH/dev/
+    sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
+    sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
+    #sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
+}
+
+function umount_user_fs() {
+    #sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
+}
+
+function err_exit() {
+    umount_user_fs
+    exit 1
+}
+trap err_exit ERR
+
+function err_exit() {
+    umount_user_fs
+    exit 1
+}
+trap err_exit INT
 
 echo -e "\033[34m Debootstrap rootfs...\033[0m"
+# mount dev/ dev/pst proc/
+mount_user_fs
+
 # config debian
-sudo LANGUAGE="en_US" LC_ALL=C LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
-    LC_MEASUREMENT="zh_CN.UTF-8" LC_NAME="zh_CN.UTF-8" LC_TELEPHONE="zh_CN.UTF-8" LC_ADDRESS="zh_CN.UTF-8" \
-    LC_MONETARY="zh_CN.UTF-8" LC_TIME="zh_CN.UTF-8" LANG="en_US.UTF-8" chroot $RF_SOURCE_ROOTFS_PATH /debootstrap/debootstrap --second-stage --verbose
+sudo LC_ALL=C chroot $RF_SOURCE_ROOTFS_PATH /debootstrap/debootstrap --second-stage --verbose
 
 #-------------------------------user define-------------------------------
 echo -e "\033[34m Copy user files...\033[0m"
@@ -45,14 +66,6 @@ sudo cp -rf overlay-debug/* $RF_SOURCE_ROOTFS_PATH/
 
 # hack the serial
 sudo cp -f overlay/usr/lib/systemd/system/serial-getty@.service $RF_SOURCE_ROOTFS_PATH/lib/systemd/system/serial-getty@.service
-
-# adb
-if [ "$RF_ARCH" == "armhf" ]; then
-    sudo cp -rf overlay-debug/usr/local/share/adb/adbd-32 $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
-elif [ "$RF_ARCH" == "arm64" ]; then
-    sudo cp -rf overlay-debug/usr/local/share/adb/adbd-64 $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
-fi
-sudo chmod +x $RF_SOURCE_ROOTFS_PATH/usr/local/bin/adbd
 
 # adb
 if [ "$RF_ARCH" == "armhf" ]; then
@@ -86,15 +99,8 @@ fi
 
 #-------------------------------user define------------------------------
 echo -e "\033[34m Chroot rootfs and config software...\033[0m"
-RF_USER=admin
-RF_HOST=server
-RF_USER_PASSWD=admin
-RF_ROOT_PASSWD=admin
-
 # config rootfs
-sudo LANGUAGE="en_US" LC_ALL=C LC_PAPER="zh_CN.UTF-8" LC_NUMERIC="zh_CN.UTF-8" LC_IDENTIFICATION="zh_CN.UTF-8" \
-    LC_MEASUREMENT="zh_CN.UTF-8" LC_NAME="zh_CN.UTF-8" LC_TELEPHONE="zh_CN.UTF-8" LC_ADDRESS="zh_CN.UTF-8" \
-    LC_MONETARY="zh_CN.UTF-8" LC_TIME="zh_CN.UTF-8" LANG="en_US.UTF-8" chroot $RF_SOURCE_ROOTFS_PATH <<EOF
+sudo LC_ALL=C chroot $RF_SOURCE_ROOTFS_PATH <<EOF
 # ----------------------------------------user---------------------------------------------------
 # add new user and passwd
 sh /etc/app/cr_user_ps.sh $RF_USER $RF_USER_PASSWD # user , pass
@@ -172,10 +178,7 @@ apt-get clean
 exit
 EOF
 #-------------------------------user define------------------------------
-
-#sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
-sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
-sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
-sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
+# umount dev/ dev/pst proc/
+umount_user_fs
 
 echo -e "\033[34m Create rootfs end.\033[0m"

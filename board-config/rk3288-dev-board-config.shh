@@ -19,3 +19,11 @@ export RF_ARCH=armhf
 export RF_KERNEL_MODULE_PATH=../kernel-module/lib/
 # RF_WLAN_KERNEL_MODULE_PATH: /xxx/xx/x
 export RF_WLAN_KERNEL_MODULE_PATH=../kernel/drivers/net/wireless/rockchip_wlan
+# rootfs user name 
+export RF_USER=admin
+# rootfs user passwd 
+export RF_USER_PASSWD=admin
+# rootfs root passwd 
+export RF_ROOT_PASSWD=admin
+# rootfs host name 
+export RF_HOST=server
