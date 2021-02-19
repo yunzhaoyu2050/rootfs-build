@@ -1,0 +1,17 @@
+# board-config-info.shh
+#!/bin/bash
+
+CUR_PATH=`pwd`
+
+# RF_SYSTEM_TYPE: debian , ubuntu
+export RF_SYSTEM_TYPE=debian
+# RF_SYSTEM_VERSION: stretch debian9 , buster debian10
+export RF_SYSTEM_VERSION=buster
+# RF_SOURCE_ROOTFS_PATH: ./debian_rootfs/
+export RF_SOURCE_ROOTFS_PATH="debian_buster_rootfs"
+# RF_ARCH: arm64 , armhf
+export RF_ARCH=arm64
+# RF_KERNEL_MODULE_PATH: /xxx/xx/x
+export RF_KERNEL_MODULE_PATH=/mcuzone/work/mdk3308/oem_mdk/lib/
+# RF_WLAN_KERNEL_MODULE_PATH: /xxx/xx/x
+export RF_WLAN_KERNEL_MODULE_PATH=../kernel/drivers/net/wireless/rockchip_wlan
