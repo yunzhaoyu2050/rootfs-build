@@ -26,18 +26,22 @@ echo "127.0.0.1 localhost.localdomain localhost" >> /etc/hosts
 # config eth0
 echo -e "\033[34m config eth0\033[0m"
 
-echo "auto eth0" > /etc/network/interfaces.d/eth0
-echo "iface eth0 inet static" >> /etc/network/interfaces.d/eth0
-echo "address 169.254.24.22" >> /etc/network/interfaces.d/eth0
-echo "netmask 255.255.0.0" >> /etc/network/interfaces.d/eth0
-echo "gateway 169.254.24.1" >> /etc/network/interfaces.d/eth0
+{
+    echo "auto eth0"
+    echo "iface eth0 inet static"
+    echo "address 192.168.1.22"
+    echo "netmask 255.255.255.0"
+    echo "gateway 192.168.1.1"
+} >> /etc/network/interfaces.d/eth0
 
 # config wlan0
 echo -e "\033[34m config wlan0\033[0m"
 
-echo "auto wlan0" > /etc/network/interfaces.d/wlan0
-echo "iface wlan0 inet dhcp" >> /etc/network/interfaces.d/wlan0
-echo "    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf" >> /etc/network/interfaces.d/wlan0
+{
+    echo "auto wlan0"
+    echo "iface wlan0 inet dhcp"
+    echo "    wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf"
+} >> /etc/network/interfaces.d/wlan0
 
 #
 # 1.Change the TimeoutStartSec=5min inside to TimeoutStartSec=5sec 
