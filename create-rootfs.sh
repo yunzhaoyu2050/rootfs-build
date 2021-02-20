@@ -19,13 +19,6 @@ else
     exit 1
 fi
 
-function mount_user_fs() {
-    sudo mount --bind /dev $RF_SOURCE_ROOTFS_PATH/dev/
-    sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
-    sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
-    #sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
-}
-
 function umount_user_fs() {
     #sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
     sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
@@ -34,20 +27,29 @@ function umount_user_fs() {
 }
 
 function err_exit() {
-    umount_user_fs
+    #sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
     exit 1
 }
 trap err_exit ERR
 
-function err_exit() {
-    umount_user_fs
+function int_exit() {
+    #sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
+    sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
     exit 1
 }
-trap err_exit INT
+trap int_exit INT
 
 echo -e "\033[34m Debootstrap rootfs...\033[0m"
 # mount dev/ dev/pst proc/
-mount_user_fs
+sudo mount --bind /dev $RF_SOURCE_ROOTFS_PATH/dev/
+sudo mount --bind /proc $RF_SOURCE_ROOTFS_PATH/proc/
+sudo mount --bind /dev/pts $RF_SOURCE_ROOTFS_PATH/dev/pts/
+#sudo mount --bind /sys $RF_SOURCE_ROOTFS_PATH/sys/
 
 # config debian
 sudo LC_ALL=C chroot $RF_SOURCE_ROOTFS_PATH /debootstrap/debootstrap --second-stage --verbose
@@ -70,14 +72,17 @@ echo -e "\033[34m Chroot rootfs and config software...\033[0m"
 # config rootfs
 sudo LC_ALL=C chroot $RF_SOURCE_ROOTFS_PATH <<EOF
 chmod +x /etc/app/ud-sys-*.sh
-sh /etc/app/ud-sys-configsystem-01.sh $RF_USER $RF_USER_PASSWD $RF_ROOT_PASSWD $RF_HOST
-sh /etc/app/ud-sys-installsoftware-02.sh 
+bash /etc/app/ud-sys-configsystem-01.sh $RF_USER $RF_USER_PASSWD $RF_ROOT_PASSWD $RF_HOST
+bash /etc/app/ud-sys-installsoftware-02.sh 
 apt-get clean
 exit
 EOF
 #-------------------------------user define------------------------------
 
 # umount dev/ dev/pst proc/
-umount_user_fs
+#sudo umount $RF_SOURCE_ROOTFS_PATH/sys/
+sudo umount $RF_SOURCE_ROOTFS_PATH/dev/pts/
+sudo umount $RF_SOURCE_ROOTFS_PATH/proc/
+sudo umount $RF_SOURCE_ROOTFS_PATH/dev/
 
 echo -e "\033[34m Create rootfs end.\033[0m"

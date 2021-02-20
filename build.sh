@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-chmod +x *.sh *.shh
+chmod +x ./*.sh ./*.shh
 
 source board-config-info.shh
 echo -e "\033[32m Config :system_type:$RF_SYSTEM_TYPE, system_version:$RF_SYSTEM_VERSION.\n

@@ -48,7 +48,7 @@ sudo mkdir -p $RF_SOURCE_ROOTFS_PATH/system/lib/modules/
 sudo find $RF_WLAN_KERNEL_MODULE_PATH/* -name "*.ko" | xargs -n1 -i sudo cp {} $RF_SOURCE_ROOTFS_PATH/system/lib/modules/
 
 # kernel module
-if [ -d $RF_SOURCE_ROOTFS_PATH/lib/modules ]; then
+if [ -d $RF_SOURCE_ROOTFS_PATH/lib ]; then
     sudo cp -arf $RF_KERNEL_MODULE_PATH/* $RF_SOURCE_ROOTFS_PATH/lib/
 else
     echo -e "\033[31m kernel module error at $RF_KERNEL_MODULE_PATH.\033[0m"

@@ -1,7 +1,5 @@
 #!/bin/bash
 
-CUR_PATH=$(pwd)
-
 #
 # for user dev board define - rk3308-amic-borad
 #
