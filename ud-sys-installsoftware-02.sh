@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+ROOTFS_USER=$1
+
 function print_terminal() {
     echo -e "\033[32m $0 $@\033[0m"
     $@
@@ -20,6 +22,10 @@ print_terminal apt --fix-broken install
 #dpkg-reconfigure locales
 
 print_terminal apt-get install -y udev sudo ssh vim keyboard-configuration --no-install-recommends
+# config user authority
+#print_terminal sed -i '16a admin   ALL=(ALL:ALL) ALL' etc/sudoers
+echo "admin   ALL=(ALL:ALL) ALL" >> etc/sudoers
+print_terminal sed -i 's/PATH=\"\/usr\/local\/bin:\/usr\/bin:\/bin:\/usr\/local\/games:\/usr\/games\"/PATH=\"\/usr\/local\/bin:\/usr\/bin:\/bin:\/usr\/local\/games:\/usr\/games:\/usr\/sbin\"/' etc/profile
 
 # power management
 print_terminal apt-get install -y busybox pm-utils triggerhappy
@@ -37,6 +43,22 @@ print_terminal apt-get install -y openssh-server --no-install-recommends
 
 # wlan tools
 print_terminal apt-get install -y wireless-tools wpasupplicant iputils-ping --no-install-recommends
+
+# bluetooth tools
+print_terminal apt-get install -y bluez bluez-hcidump --no-install-recommends
+
+# minicom
+print_terminal apt-get install -y minicom --no-install-recommends
+print_terminal apt-get install -y microcom --no-install-recommends
+
+# ppp
+print_terminal apt-get install -y ppp --no-install-recommends
+
+# udhcpc
+print_terminal apt-get install -y udhcpc --no-install-recommends
+
+# can-utils
+print_terminal apt-get install -y can-utils --no-install-recommends
 
 # x ---------------------------------------------------------------------------------------------
 # for user define

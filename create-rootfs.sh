@@ -73,7 +73,7 @@ echo -e "\033[34m Chroot rootfs and config software...\033[0m"
 sudo LC_ALL=C chroot $RF_SOURCE_ROOTFS_PATH <<EOF
 chmod +x /etc/app/ud-sys-*.sh
 bash /etc/app/ud-sys-configsystem-01.sh $RF_USER $RF_USER_PASSWD $RF_ROOT_PASSWD $RF_HOST
-bash /etc/app/ud-sys-installsoftware-02.sh 
+bash /etc/app/ud-sys-installsoftware-02.sh $RF_USER
 apt-get clean
 exit
 EOF
