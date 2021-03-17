@@ -22,6 +22,7 @@ print_terminal apt --fix-broken install
 #dpkg-reconfigure locales
 
 print_terminal apt-get install -y udev sudo ssh vim keyboard-configuration --no-install-recommends
+
 # config user authority
 #print_terminal sed -i '16a admin   ALL=(ALL:ALL) ALL' etc/sudoers
 echo "admin   ALL=(ALL:ALL) ALL" >> etc/sudoers
@@ -39,6 +40,7 @@ EOF
 
 print_terminal apt-get install -y rsyslog bash-completion htop --no-install-recommends --fix-missing
 
+# openssh
 print_terminal apt-get install -y openssh-server --no-install-recommends
 
 # wlan tools

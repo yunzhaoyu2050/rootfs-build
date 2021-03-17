@@ -12,10 +12,10 @@ fi
 
 #-------------------------------user define-------------------------------
 echo -e "\033[34m Copy user files.start.\033[0m"
-# overlay folder
+# overlay folder - user define
 sudo cp -rf overlay/* $RF_SOURCE_ROOTFS_PATH/
 
-# overlay-firmware folder
+# overlay-firmware folder - bt & wifi
 sudo cp -rf overlay-firmware/* $RF_SOURCE_ROOTFS_PATH/
 
 # overlay-debug folder
