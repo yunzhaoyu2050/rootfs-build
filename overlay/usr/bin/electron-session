@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# start electron app test
+
+#
+# create /root/.Xauthority
+#
+# root mode
+
+ELECTRON_APP_NAME="app"
+ELECTRON_APP_LOG_PATH="/var/log/elrunlog.log"
+
+function create_xauthority()
+{
+    xauth add :0 /root/.Xauthority $(mcookie)
+    if [ $? -ne 0 ]; then
+        # wanring状态也能生成.Xauthority认证文件
+        echo "[electron-session]:warning, failed. at start electron:${ELECTRON_APP_NAME}, for create Xauthority."
+        #exit -1
+    fi
+}
+
+# 默认认证给root账户下
+cd /root/
+export DISPLAY=:0.0
+XAUTHORITY=$(xauth list)
+local temp1=$(echo $XAUTHORITY | awk -F" " '{print $1}' | awk -F"/" '{print $2}')
+local temp2=$(echo $XAUTHORITY | awk -F" " '{print $4}' | awk -F"/" '{print $2}')
+if [ -f /root/.Xauthority ]; then
+    if [ "$temp1" == "unix:0" ] || [ "$temp2" == "unix:0" ]; then
+        echo "check Xauthority end."
+    else
+        rm -f /root/.Xauthority
+        create_xauthority
+    fi
+else
+    create_xauthority
+fi
+
+electron-startx >>$ELECTRON_APP_LOG_PATH
+
+# # start xserver
+# nohup /usr/bin/X -auth /root/.Xauthority >> /dev/null 2>&1 &
+# if [ $? -ne 0 ]; then
+#     echo "[electron-session]:failed xserver start."
+# fi
+
+# # start electron client
+# nohup /home/electron/electron /home/electron/electron-api-demos/ --no-sandbox --enable-logging >> $ELECTRON_APP_LOG_PATH 2>&1 &
+
+cd -

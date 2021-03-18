@@ -1,0 +1,25 @@
+[Unit]
+Description=Electron app server
+After=sshd.service sshd-keygen.service
+
+[Service]
+Type=simple
+
+User=root
+Group=root
+
+Environment="DISPLAY=:0"
+
+ExecStart=/bin/bash /usr/bin/electron-session
+ExecStop=/usr/bin/pkill -9 electron
+
+StandardOutput=/var/log/
+StandardError=syslog
+
+KillMode=control-group
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
+
